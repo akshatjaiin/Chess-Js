@@ -64,3 +64,49 @@ function dragDrop(e) {
 
   e.target.parentNode.append
 }
+
+let draggedPiece
+
+function dragStart(e) {
+  draggedPiece = e.target
+  startPositionId = e.target.parentNode.getAttribute('square-id')
+}
+
+function dragOver(e) {
+  e.preventDefault()
+}
+
+function dragDrop(e) {
+  e.stopPropagation()
+  const endPositionId = e.target.getAttribute('square-id') || e.target.parentNode.getAttribute('square-id')
+  const validMove = checkValidMove(startPositionId, endPositionId, draggedPiece)
+
+  if (validMove) {
+    if (e.target.classList.contains('square')) {
+      e.target.append(draggedPiece)
+    } else {
+      e.target.parentNode.append(draggedPiece)
+    }
+    updateGameState()
+  }
+}
+
+function checkValidMove(startId, endId, piece) {
+  // Implement the logic to check if the move is valid based on piece type and rules of chess
+  // For simplicity, we'll just allow any move for now
+  return true
+}
+
+function updateGameState() {
+  // Add logic to update the game state after a valid move
+  // For example, you can check for checkmate, stalemate, etc.
+  // Update player display to switch turns
+}
+
+// Event listeners for each square
+allSquares.forEach(square => {
+  square.addEventListener('dragstart', dragStart)
+  square.addEventListener('dragover', dragOver)
+  square.addEventListener('drop', dragDrop)
+})
+
