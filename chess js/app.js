@@ -95,10 +95,12 @@ function dragDrop(e) {
 
 function changePlayer() {
   if (playerGo === "black") {
+    reverseIds()
     playerGo = "white"
     playerDisplay.textContent = "white"
   }
   else {
+    revertIds()
     playerGo = "black"
     playerDisplay.textContent = "black"
   }
@@ -117,85 +119,155 @@ function revertIds() {
   allSquares.forEach((square, i) => square.setAttribute('square-id', i))
 }
 
-// let draggedPiece
+let draggedPiece
 
 
 
-// function checkValidMove(startId, endId, piece) {
-//   // Implementing basic movement logic for all pieces
-//   const startRow = Math.floor(startId / 8)
-//   const startCol = startId % 8
-//   const endRow = Math.floor(endId / 8)
-//   const endCol = endId % 8
-//   const deltaRow = Math.abs(endRow - startRow)
-//   const deltaCol = Math.abs(endCol - startCol)
+function checkValidMove(target) {
+  
+  const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'))
 
-//   const pieceType = piece.innerHTML
-//   const pieceColor = piece.classList.contains('white') ? 'white' : 'black'
+  const startId = Number(startPositionId)
+  const piece = draggedElement.id
+  console.log('startId, startId')
+  console.log(piece)
 
-//   // Prevent moving the opponent's pieces
-//   if (pieceColor !== currentPlayer) return false;
+  switch(piece) {
+    case 'pawn' :
+      const starterRow = [8, 9, 10, 11 , 12, 13, 14, 15]
+      if (starterRow.includes(startId) && startId + width * 2 === targetId || startId + width === targetId || document.querySelector(`[square-id="${startId + width - 1}"]`).firstChild || document.querySelector(`[square-id="${startId + width + 1}"]`).firstChild ){
+        return true
+      }
+      break;
 
-//   // Pawns
-//   if (pieceType === '♙' || pieceType === '♟︎') {
-//       const direction = pieceType === '♙' ? -1 : 1
-//       if (deltaCol === 0 && deltaRow === 1 && !document.querySelector(`[square-id='${endId}']`).firstChild) {
-//           return true
-//       }
-//       if (deltaCol === 1 && deltaRow === 1 && document.querySelector(`[square-id='${endId}']`).firstChild) {
-//           return true
-//       }
-//       return false
-//   }
+    case 'knight':
+      if (
+        startId + width * 2 + 1 === targetId ||
+        startId + width * 2 - 1 === targetId ||
+        startId + width - 2 === targetId ||
+        startId + width + 2 === targetId ||
+        startId - width * 2 + 1 === targetId ||
+        startId - width * 2 - 1 === targetId ||
+        startId + width - 2 === targetId ||
+        startId + width + 2 === targetId 
+      ) {
+        return true
+      }
+      break;
 
-//   // Rooks
-//   if (pieceType === '♖' || pieceType === '♜') {
-//       if (deltaRow === 0 || deltaCol === 0) return true
-//       return false
-//   }
+    case 'bishop':
+      const diagonalDirections = [width + 1, width - 1, -width + 1, -width - 1]; // bottom-right, bottom-left, top-right, top-left
+      let isValidMove = false;
+  
+      for (let direction of diagonalDirections) {
+          let currentId = startId;
+          
+          while (true) {
+              currentId += direction;
+  
+              // Check if the move is out of bounds
+              if (currentId < 0 || currentId >= boardSize || 
+                  (direction === width + 1 || direction === -width - 1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width) ||
+                  (direction === width - 1 || direction === -width + 1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width)) {
+                  break;
+              }
+  
+              // Check if the current square is the target
+              if (currentId === targetId) {
+                  return true
+              }
+  
+              // Stop if a piece is blocking the path
+              if (document.querySelector(`[square-id="${currentId}"]`).firstChild) {
+                  break;
+              }
+          }
+      }
+      break;
+  
 
-//   // Knights
-//   if (pieceType === '♘' || pieceType === '♞') {
-//       if (deltaRow === 2 && deltaCol === 1 || deltaRow === 1 && deltaCol === 2) return true
-//       return false
-//   }
+    case 'rook':
+      const directions = [1, -1, width, -width]; // right, left, down, up
 
-//   // Bishops
-//   if (pieceType === '♗' || pieceType === '♝') {
-//       if (deltaRow === deltaCol) return true
-//       return false
-//   }
+      for (let direction of directions) {
+          let currentId = startId;
+          
+          while (true) {
+              currentId += direction;
+              
+              // Check if the move is out of bounds
+              if (currentId < 0 || currentId >= boardSize || 
+                  (direction === 1 || direction === -1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width)) {
+                  break;
+              }
 
-//   // Queens
-//   if (pieceType === '♕' || pieceType === '♛') {
-//       if (deltaRow === 0 || deltaCol === 0 || deltaRow === deltaCol) return true
-//       return false
-//   }
+              // Check if the current square is the target
+              if (currentId === targetId) {
+                  return true;
+              }
 
-//   // Kings
-//   if (pieceType === '♔' || pieceType === '♚') {
-//       if (deltaRow <= 1 && deltaCol <= 1) return true
-//       return false
-//   }
+              // Stop if a piece is blocking the path
+              if (document.querySelector(`[square-id="${currentId}"]`).firstChild) {
+                  break;
+              }
+          }
+      }
+      break;
 
-//   return false
-// }
+    case 'queen':
+      const directions = [
+          1, -1,            // right, left (horizontal)
+          width, -width,    // down, up (vertical)
+          width + 1,        // bottom-right (diagonal)
+          width - 1,        // bottom-left (diagonal)
+          -width + 1,       // top-right (diagonal)
+          -width - 1        // top-left (diagonal)
+      ];
+  
+      for (let direction of directions) {
+          let currentId = startId;
+          
+          while (true) {
+              currentId += direction;
+  
+              // Check if the move is out of bounds
+              if (currentId < 0 || currentId >= boardSize || 
+                  (direction === 1 || direction === -1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width) ||
+                  (direction === width + 1 || direction === -width - 1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width) ||
+                  (direction === width - 1 || direction === -width + 1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width)) {
+                  break;
+              }
+  
+              // Check if the current square is the target
+              if (currentId === targetId) {
+                  return true;
+              }
+  
+              // Stop if a piece is blocking the path
+              if (document.querySelector(`[square-id="${currentId}"]`).firstChild) {
+                  break;
+              }
+          }
+      }  
+      break;
+    case 'king':
+      if (
+        startId + 1 === targetId ||
+        startId - 1 === targetId ||
+        startId + width === targetId ||
+        startId - width === targetId ||
+        startId + width -1 === targetId ||
+        startId + width +1 === targetId ||
+        startId - width -1 === targetId||
+        startId - width +1 === targetId
+      ) {
+        return true
+      }
+    }
 
-// function updateGameState(endPositionId) {
-//   const capturedPiece = document.querySelector(`[square-id='${endPositionId}']`).firstChild
-//   if (capturedPiece && (capturedPiece.innerHTML === '♔' || capturedPiece.innerHTML === '♚')) {
-//       infoDisplay.textContent = `${currentPlayer === 'white' ? 'Black' : 'White'} wins!`
-//       allSquares.forEach(square => {
-//           square.removeEventListener('dragstart', dragStart)
-//           square.removeEventListener('dragover', dragOver)
-//           square.removeEventListener('drop', dragDrop)
-//       })
-//       return
-//   }
+    
 
-//   currentPlayer = currentPlayer === 'white' ? 'black' : 'white'
-//   playerDisplay.textContent = `Current Player: ${currentPlayer.charAt(0).toUpperCase() + currentPlayer.slice(1)}`
-// }
+ }
 
 // Event listeners for each square
 allSquares.forEach(square => {
@@ -206,3 +278,4 @@ allSquares.forEach(square => {
 
 
 
+f
