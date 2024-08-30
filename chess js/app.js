@@ -155,101 +155,127 @@ function checkValidMove(target) {
       }
       break;
 
-    case 'bishop':
-      const diagonalDirections = [width + 1, width - 1, -width + 1, -width - 1]; // bottom-right, bottom-left, top-right, top-left
-      let isValidMove = false;
-  
-      for (let direction of diagonalDirections) {
-          let currentId = startId;
-          
-          while (true) {
-              currentId += direction;
-  
-              // Check if the move is out of bounds
-              if (currentId < 0 || currentId >= boardSize || 
-                  (direction === width + 1 || direction === -width - 1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width) ||
-                  (direction === width - 1 || direction === -width + 1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width)) {
-                  break;
-              }
-  
-              // Check if the current square is the target
-              if (currentId === targetId) {
-                  return true
-              }
-  
-              // Stop if a piece is blocking the path
-              if (document.querySelector(`[square-id="${currentId}"]`).firstChild) {
-                  break;
-              }
+      case 'bishop':
+        if (
+          startId + width + 1 === targetId ||
+          startId + width - 1 === targetId ||
+          startId - width + 1 === targetId ||
+          startId - width - 1 === targetId ||
+          startId + 2 * width + 2 === targetId ||
+          startId + 2 * width - 2 === targetId ||
+          startId - 2 * width + 2 === targetId ||
+          startId - 2 * width - 2 === targetId ||
+          startId + 3 * width + 3 === targetId ||
+          startId + 3 * width - 3 === targetId ||
+          startId - 3 * width + 3 === targetId ||
+          startId - 3 * width - 3 === targetId ||
+          startId + 4 * width + 4 === targetId ||
+          startId + 4 * width - 4 === targetId ||
+          startId - 4 * width + 4 === targetId ||
+          startId - 4 * width - 4 === targetId ||
+          startId + 5 * width + 5 === targetId ||
+          startId + 5 * width - 5 === targetId ||
+          startId - 5 * width + 5 === targetId ||
+          startId - 5 * width - 5 === targetId ||
+          startId + 6 * width + 6 === targetId ||
+          startId + 6 * width - 6 === targetId ||
+          startId - 6 * width + 6 === targetId ||
+          startId - 6 * width - 6 === targetId ||
+          startId + 7 * width + 7 === targetId ||
+          startId + 7 * width - 7 === targetId ||
+          startId - 7 * width + 7 === targetId ||
+          startId - 7 * width - 7 === targetId 
+        ) {
+          return true
+        }
+        break;
+
+        case 'rook':
+          if (
+            startId + 1 === targetId || startId - 1 === targetId ||
+            startId + width === targetId || startId - width === targetId ||
+            startId + 2 === targetId ||  startId - 2 === targetId ||
+            startId + 2 * width === targetId || startId - 2 * width === targetId ||
+            startId + 3 === targetId || startId - 3 === targetId ||
+            startId + 3 * width === targetId || startId - 3 * width === targetId ||
+            startId + 4 === targetId || startId - 4 === targetId ||
+            startId + 4 * width === targetId || startId - 4 * width === targetId ||
+            startId + 5 === targetId || startId - 5 === targetId ||
+            startId + 5 * width === targetId || startId - 5 * width === targetId ||
+            startId + 6 === targetId ||  startId - 6 === targetId ||
+            startId + 6 * width === targetId || startId - 6 * width === targetId ||
+            startId + 7 === targetId || startId - 7 === targetId ||
+            startId + 7 * width === targetId || startId - 7 * width === targetId
+          ) {
+            return true
           }
-      }
-      break;
-  
+          break;
 
-    case 'rook':
-      const directions = [1, -1, width, -width]; // right, left, down, up
-
-      for (let direction of directions) {
-          let currentId = startId;
-          
-          while (true) {
-              currentId += direction;
-              
-              // Check if the move is out of bounds
-              if (currentId < 0 || currentId >= boardSize || 
-                  (direction === 1 || direction === -1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width)) {
-                  break;
-              }
-
-              // Check if the current square is the target
-              if (currentId === targetId) {
-                  return true;
-              }
-
-              // Stop if a piece is blocking the path
-              if (document.querySelector(`[square-id="${currentId}"]`).firstChild) {
-                  break;
-              }
-          }
-      }
-      break;
-
-    case 'queen':
-      const directions = [
-          1, -1,            // right, left (horizontal)
-          width, -width,    // down, up (vertical)
-          width + 1,        // bottom-right (diagonal)
-          width - 1,        // bottom-left (diagonal)
-          -width + 1,       // top-right (diagonal)
-          -width - 1        // top-left (diagonal)
-      ];
-  
-      for (let direction of directions) {
-          let currentId = startId;
-          
-          while (true) {
-              currentId += direction;
-  
-              // Check if the move is out of bounds
-              if (currentId < 0 || currentId >= boardSize || 
-                  (direction === 1 || direction === -1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width) ||
-                  (direction === width + 1 || direction === -width - 1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width) ||
-                  (direction === width - 1 || direction === -width + 1) && Math.floor(currentId / width) !== Math.floor((currentId - direction) / width)) {
-                  break;
-              }
-  
-              // Check if the current square is the target
-              if (currentId === targetId) {
-                  return true;
-              }
-  
-              // Stop if a piece is blocking the path
-              if (document.querySelector(`[square-id="${currentId}"]`).firstChild) {
-                  break;
-              }
-          }
-      }  
-      break;
+          case 'queen':
+            // Combine the bishop's and rook's movements
+            if (
+              // Bishop's movements (diagonal)
+              startId + width + 1 === targetId ||
+              startId + width - 1 === targetId ||
+              startId - width + 1 === targetId ||
+              startId - width - 1 === targetId ||
+              startId + 2 * width + 2 === targetId ||
+              startId + 2 * width - 2 === targetId ||
+              startId - 2 * width + 2 === targetId ||
+              startId - 2 * width - 2 === targetId ||
+              startId + 3 * width + 3 === targetId ||
+              startId + 3 * width - 3 === targetId ||
+              startId - 3 * width + 3 === targetId ||
+              startId - 3 * width - 3 === targetId ||
+              startId + 4 * width + 4 === targetId ||
+              startId + 4 * width - 4 === targetId ||
+              startId - 4 * width + 4 === targetId ||
+              startId - 4 * width - 4 === targetId ||
+              startId + 5 * width + 5 === targetId ||
+              startId + 5 * width - 5 === targetId ||
+              startId - 5 * width + 5 === targetId ||
+              startId - 5 * width - 5 === targetId ||
+              startId + 6 * width + 6 === targetId ||
+              startId + 6 * width - 6 === targetId ||
+              startId - 6 * width + 6 === targetId ||
+              startId - 6 * width - 6 === targetId ||
+              startId + 7 * width + 7 === targetId ||
+              startId + 7 * width - 7 === targetId ||
+              startId - 7 * width + 7 === targetId ||
+              startId - 7 * width - 7 === targetId ||
+              // Rook's movements (horizontal and vertical)
+              startId + 1 === targetId ||
+              startId - 1 === targetId ||
+              startId + width === targetId ||
+              startId - width === targetId ||
+              startId + 2 === targetId ||
+              startId - 2 === targetId ||
+              startId + 2 * width === targetId ||
+              startId - 2 * width === targetId ||
+              startId + 3 === targetId ||
+              startId - 3 === targetId ||
+              startId + 3 * width === targetId ||
+              startId - 3 * width === targetId ||
+              startId + 4 === targetId ||
+              startId - 4 === targetId ||
+              startId + 4 * width === targetId ||
+              startId - 4 * width === targetId ||
+              startId + 5 === targetId ||
+              startId - 5 === targetId ||
+              startId + 5 * width === targetId ||
+              startId - 5 * width === targetId ||
+              startId + 6 === targetId ||
+              startId - 6 === targetId ||
+              startId + 6 * width === targetId ||
+              startId - 6 * width === targetId ||
+              startId + 7 === targetId ||
+              startId - 7 === targetId ||
+              startId + 7 * width === targetId ||
+              startId - 7 * width === targetId
+            ) {
+              return true
+            }
+            break;
     case 'king':
       if (
         startId + 1 === targetId ||
@@ -277,5 +303,3 @@ allSquares.forEach(square => {
 })
 
 
-
-f
