@@ -53,9 +53,12 @@ allSquares.forEach(square => {
 
 })
 
+let draggedElement;
+
 let startPositionId
 function dragStart (e) {
   startPositionId = console.log(e.target.parentNode.getAttribute('square-id'))
+  draggedElement = e.target; // store the dragged element
 }
 
 function dragOver(e) {
@@ -63,34 +66,35 @@ function dragOver(e) {
 }
 
 function dragDrop(e) {
-  e.stopPropagation()
-  const correctGo = draggedElement.firstChild.classList.contains(playerGo)
-  const taken = e.target.classList.contains('piece')
-  const opponentGo = playerGo === 'white' ? 'black' : 'white'
-  const valid = checkIfValid(e.target)
-  const takenByOpponent = e.target.firstChild?.classList.contains(opponentGo)
+  e.stopPropagation();
+  const correctGo = draggedElement.firstChild.classList.contains(playerGo);
+  const taken = e.target.classList.contains('piece');
+  const opponentGo = playerGo === 'white' ? 'black' : 'white';
+  const valid = checkValidMove(e.target);
+  const takenByOpponent = e.target.firstChild?.classList.contains(opponentGo);
 
   if (correctGo) {
-    // if taken by oppnent and valid then do something
+    // if taken by opponent and valid then do something
     if (takenByOpponent && valid) {
-      e.target.parentNode.append(draggedElement)
-      e.target.remove()
-      changePlayer()
-      return
+      e.target.parentNode.removeChild(draggedElement); // Remove from original square
+      e.target.append(draggedElement);
+      e.target.remove();
+      changePlayer();
+      return;
     }
 
-    if (taken && !takenByOpponent)  {
-      infoDisplay.textContent = "you cannot go here !!"
-      setTimeout(() =>infoDisplay.textContent = "", 2000)
-      return
+    if (taken && !takenByOpponent) {
+      infoDisplay.textContent = "you cannot go here !!";
+      setTimeout(() => infoDisplay.textContent = "", 2000);
+      return;
     }
     if (valid) {
-      e.target.append(draggedElement)
-      changePlayer()
-      return
+      e.target.parentNode.removeChild(draggedElement); // Remove from original square
+      e.target.append(draggedElement);
+      changePlayer();
+      return;
     }
   }
-  
 }
 
 function changePlayer() {
@@ -124,6 +128,10 @@ let draggedPiece
 
 
 function checkValidMove(target) {
+  if (!target || !target.firstChild) {
+    return false; // or handle this case differently if needed
+  }
+
   
   const targetId = Number(target.getAttribute('square-id')) || Number(target.parentNode.getAttribute('square-id'))
 
