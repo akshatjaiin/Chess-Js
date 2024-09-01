@@ -57,7 +57,8 @@ let draggedElement;
 
 let startPositionId
 function dragStart (e) {
-  startPositionId = console.log(e.target.parentNode.getAttribute('square-id'))
+  startPositionId = e.target.parentNode.getAttribute('square-id');
+  startPositionId = e.target.parentNode.getAttribute('square-id');
   draggedElement = e.target; // store the dragged element
 }
 
@@ -67,35 +68,30 @@ function dragOver(e) {
 
 function dragDrop(e) {
   e.stopPropagation();
-  const correctGo = draggedElement.firstChild.classList.contains(playerGo);
-  const taken = e.target.classList.contains('piece');
-  const opponentGo = playerGo === 'white' ? 'black' : 'white';
-  const valid = checkValidMove(e.target);
-  const takenByOpponent = e.target.firstChild?.classList.contains(opponentGo);
+  let opponentGo = playerGo === 'black' ? 'white' : 'black';
+  const correctGo = draggedElement.classList.contains(playerGo); // Check if the piece belongs to the current player
+  const targetSquare = e.target.classList.contains('square') ? e.target : e.target.parentNode; // Get the square
+  const takenByOpponent = targetSquare.firstChild?.classList.contains(opponentGo); // Check if the target square contains an opponent's piece
+  const valid = checkValidMove(targetSquare); // Check if the move is valid
 
-  if (correctGo) {
-    // if taken by opponent and valid then do something
-    if (takenByOpponent && valid) {
-      e.target.parentNode.removeChild(draggedElement); // Remove from original square
-      e.target.append(draggedElement);
-      e.target.remove();
-      changePlayer();
-      return;
+  if (correctGo && valid) {
+    // If the target square has an opponent's piece, remove it (capture)
+    if (takenByOpponent) {
+      targetSquare.removeChild(targetSquare.firstChild); // Remove the opponent's piece
     }
 
-    if (taken && !takenByOpponent) {
-      infoDisplay.textContent = "you cannot go here !!";
-      setTimeout(() => infoDisplay.textContent = "", 2000);
-      return;
-    }
-    if (valid) {
-      e.target.parentNode.removeChild(draggedElement); // Remove from original square
-      e.target.append(draggedElement);
-      changePlayer();
-      return;
-    }
+    // Move the piece to the new square
+    targetSquare.appendChild(draggedElement);
+
+    // Switch turns
+    changePlayer();
+  } else {
+    // If the move is invalid, show a message
+    infoDisplay.textContent = "Invalid move!";
+    setTimeout(() => infoDisplay.textContent = "", 2000);
   }
 }
+
 
 function changePlayer() {
   if (playerGo === "black") {
