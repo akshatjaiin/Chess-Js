@@ -1,5 +1,5 @@
 # ♟️ JavaScript Chess Game
-
+https://raw.githack.com/akshatjaiin/Chess-Js/main/chess%20js/index.html
 Welcome to the **JavaScript Chess Game**! This is a simple and interactive chess game built using JavaScript, HTML, and CSS. The game allows two players to play chess directly in the browser with drag-and-drop functionality for moving pieces.
 
 ## 🎮 Features
@@ -53,5 +53,6 @@ Welcome to the **JavaScript Chess Game**! This is a simple and interactive chess
 
 Contributions are welcome! Feel free to submit a pull request or open an issue to suggest improvements.
 
+![image](https://github.com/user-attachments/assets/56e9c561-f6c5-4f11-8aa7-186874b2683f)
 
 Enjoy the game and happy playing! 🏆
